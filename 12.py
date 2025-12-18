@@ -35,7 +35,7 @@ from utils.embedding import get_embedding  # uses EMBEDDING_BACKEND
 # ---------------------------
 # Config
 # ---------------------------
-GEN_MODEL = os.getenv("OPENAI_GEN_MODEL", "gpt-5.2")
+GEN_MODEL = os.getenv("OPENAI_GEN_MODEL", "gpt-4o")
 DEBUG = False  # set from args
 
 def _path(*parts):
