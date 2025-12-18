@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/index.py": {
-      "maxDuration": 60
+      "maxDuration": 300,
+      "memory": 1024
     }
   },
   "routes": [
@@ -9,5 +10,8 @@
       "src": "/(.*)",
       "dest": "/api/index.py"
     }
-  ]
+  ],
+  "env": {
+    "TOKENIZERS_PARALLELISM": "false"
+  }
 }
