@@ -213,6 +213,22 @@ curl -X POST https://your-project.vercel.app/api/generate \
 - 📁 Consider using external storage for very large datasets
 - 📁 Current data files (~45MB) should work on free tier
 
+## 🔧 Troubleshooting
+
+### **"Pattern doesn't match any Serverless Functions" Error**
+If you get this error, it means Vercel can't find the serverless function:
+
+1. **Check file structure**: Ensure `api/index.py` exists
+2. **Verify vercel.json**: Make sure the path matches exactly
+3. **Test locally**: Run `vercel dev` to test before deploying
+4. **Check Python runtime**: Ensure `requirements.txt` is in root directory
+
+### **Import Errors**
+If the function can't import dependencies:
+- Ensure all dependencies are in `requirements.txt`
+- Check that file paths are correct in `api/index.py`
+- Verify environment variables are set in Vercel dashboard
+
 ---
 
 ## 🎯 Quick Deployment Checklist
