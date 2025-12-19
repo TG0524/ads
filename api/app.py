@@ -180,7 +180,7 @@ def retrieve_segments():
 
         # Build command for 12.py
         cmd = [
-            sys.executable, '../12.py',
+            sys.executable, '12.py',
             '--brief', campaign_brief,
             '--kw-weight', str(keyword_weight),
             '--retrieval-only'  # Only get matches, no LLM generation
@@ -231,7 +231,7 @@ def generate_segments():
 
         # Build command for 12.py (without --retrieval-only for full generation)
         cmd = [
-            sys.executable, '../12.py',
+            sys.executable, '12.py',
             '--brief', campaign_brief,
             '--kw-weight', str(keyword_weight)
         ]
