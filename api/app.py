@@ -471,8 +471,8 @@ def health():
 @app.route('/test')
 def test():
     return jsonify({'message': 'Test endpoint working', 'files_exist': {
-        'docs.jsonl': os.path.exists('Data/docs.jsonl'),
-        'faiss.index': os.path.exists('Data/faiss.index'),
+        'docs2.jsonl': os.path.exists('Data/docs2.jsonl'),
+        'faiss2.index': os.path.exists('Data/faiss2.index'),
         'japan.json': os.path.exists('Data/japan.json')
     }})
 
