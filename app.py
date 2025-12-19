@@ -492,15 +492,22 @@ def test():
 # ---------------------------------------
 # Entrypoint
 # ---------------------------------------
+# For gunicorn/Railway deployment
+print("🚀 Flask app initialized for production")
+print(f"📁 Working directory: {os.getcwd()}")
+print(f"📄 Files available: {os.listdir('.')}")
+
 if __name__ == '__main__':
     # Check if 12.py exists
     if not os.path.exists('12.py'):
         print("❌ 12.py not found in current directory")
         print("Make sure 12.py is in the same folder as app.py")
 
-
     print("🚀 Starting Flask server...")
     print("📁 Serving from current directory")
-    print("🌐 Open http://localhost:5000 in your browser")
+    
+    # Get port from environment (for Railway, Render, etc.)
+    port = int(os.environ.get('PORT', 5000))
+    print(f"🌐 Server will run on port {port}")
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=port)
