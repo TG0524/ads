@@ -461,9 +461,12 @@ if __name__ == '__main__':
         print("❌ 12.py not found in current directory")
         print("Make sure 12.py is in the same folder as app.py")
 
-
     print("🚀 Starting Flask server...")
     print("📁 Serving from current directory")
-    print("🌐 Open http://localhost:5000 in your browser")
+    
+    # Get port from environment (for Railway, Render, etc.)
+    port = int(os.environ.get('PORT', 5000))
+    print(f"🌐 Server will run on port {port}")
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Production-ready settings
+    app.run(debug=False, host='0.0.0.0', port=port)
