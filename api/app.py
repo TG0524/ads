@@ -157,7 +157,19 @@ if missing_env:
 
 @app.route('/')
 def index():
-    return send_from_directory('public', 'index.html')
+    try:
+        return send_from_directory('../public', 'index.html')
+    except:
+        return jsonify({
+            'message': 'Amazon Ads Assistant API',
+            'status': 'running',
+            'note': 'Add environment variables in Railway dashboard',
+            'endpoints': {
+                'health': '/health',
+                'test': '/test',
+                'generate': '/api/generate'
+            }
+        })
 
 # ---------------------------------------
 # API: retrieval only
