@@ -425,6 +425,9 @@ def _build_generation_prompt_json(campaign_brief: str, rows: List[dict]) -> str:
         "- Use ONLY the provided segment names (verbatim)\n"
         "- Each segment must have EXACTLY 10 keywords in Japanese\n"
         "- All text content should be in Japanese\n"
+        "- DO NOT include any status messages, success messages, or system output\n"
+        "- DO NOT include text like 'Successfully generated' or similar messages\n"
+        "- Keywords must be actual product/marketing terms, not system messages\n"
     )
 
     user_msg = (
@@ -587,11 +590,29 @@ def _validate_and_render(campaign_brief: str, rows: List[dict], json_text: str) 
             else:
                 continue
 
+        # Filter out system messages from keywords
+        filtered_keywords = []
+        for k in kws[:10]:
+            k_clean = k.strip()
+            # Skip keywords that look like system messages
+            if any(phrase in k_clean.lower() for phrase in [
+                'successfully generated', 'segments with keywords', 'generation completed',
+                'success', 'generated', 'completed', '✅', '⚠️', '🔄'
+            ]):
+                debug_print(f"Filtered out system message from keywords: {k_clean}")
+                continue
+            filtered_keywords.append(k_clean)
+        
+        # If we filtered out too many, skip this segment
+        if len(filtered_keywords) < 5:
+            debug_print(f"Too many keywords filtered for {name}, skipping")
+            continue
+
         seen.add(name)
         cleaned.append({
             "segment_name": name,
             "why_it_fits": why.strip(),
-            "keywords": [k.strip() for k in kws[:10]]  # Ensure max 10 keywords
+            "keywords": filtered_keywords
         })
 
     # If we don't have all segments, use what we have instead of failing

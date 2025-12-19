@@ -374,6 +374,21 @@ def parse_generated_segments(output_text, brief=""):
             
             print(f"Original markdown keywords: {keywords}")  # Debug
 
+            # Filter out system messages from keywords
+            filtered_keywords = []
+            for kw in keywords:
+                kw_clean = kw.strip()
+                # Skip keywords that look like system messages
+                if any(phrase in kw_clean.lower() for phrase in [
+                    'successfully generated', 'segments with keywords', 'generation completed',
+                    'success', 'generated', 'completed', '✅', '⚠️', '🔄'
+                ]):
+                    print(f"Filtered out system message from keywords: {kw_clean}")
+                    continue
+                filtered_keywords.append(kw_clean)
+            
+            keywords = filtered_keywords
+
             # Only translate if keywords are in English
             if keywords and any(re.search(r'[a-zA-Z]', kw) for kw in keywords):
                 try:
