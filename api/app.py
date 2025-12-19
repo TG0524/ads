@@ -10,6 +10,10 @@ import httpx
 from packaging import version
 from openai import OpenAI
 
+# Set working directory to api folder for Railway/Render deployment
+API_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(API_DIR)
+
 # ---------------------------------------
 # HTTPX client + OpenAI client (proxy-safe)
 # ---------------------------------------
