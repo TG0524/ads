@@ -150,7 +150,21 @@ if missing_env:
 
 @app.route('/')
 def index():
-    return send_from_directory('public', 'index.html')
+    try:
+        return send_from_directory('public', 'index.html')
+    except Exception as e:
+        # Fallback if public directory not found
+        return jsonify({
+            'message': 'Amazon Ads Assistant API is running',
+            'status': 'ok',
+            'endpoints': {
+                'health': '/health',
+                'retrieve': '/api/retrieve', 
+                'generate': '/api/generate',
+                'test': '/test'
+            },
+            'note': 'Visit /health to check API status'
+        })
 
 # ---------------------------------------
 # API: retrieval only
@@ -460,11 +474,20 @@ def health():
 
 @app.route('/test')
 def test():
-    return jsonify({'message': 'Test endpoint working', 'files_exist': {
-        'docs.jsonl': os.path.exists('Data/docs.jsonl'),
-        'faiss.index': os.path.exists('Data/faiss.index'),
-        'japan.json': os.path.exists('Data/japan.json')
-    }})
+    import os
+    return jsonify({
+        'message': 'Test endpoint working',
+        'current_directory': os.getcwd(),
+        'files_in_directory': os.listdir('.'),
+        'public_exists': os.path.exists('public'),
+        'public_files': os.listdir('public') if os.path.exists('public') else [],
+        'data_files_exist': {
+            'docs2.jsonl': os.path.exists('Data/docs2.jsonl'),
+            'faiss2.index': os.path.exists('Data/faiss2.index'),
+            'japan.json': os.path.exists('Data/japan.json'),
+            '12.py': os.path.exists('12.py')
+        }
+    })
 
 # ---------------------------------------
 # Entrypoint
