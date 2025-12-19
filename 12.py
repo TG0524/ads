@@ -597,7 +597,8 @@ def _validate_and_render(campaign_brief: str, rows: List[dict], json_text: str) 
             # Skip keywords that look like system messages
             if any(phrase in k_clean.lower() for phrase in [
                 'successfully generated', 'segments with keywords', 'generation completed',
-                'success', 'generated', 'completed', '✅', '⚠️', '🔄'
+                'success', 'generated', 'completed', '✅', '⚠️', '🔄', 'segments',
+                'with keywords', 'successfully', 'generation', 'complete'
             ]):
                 debug_print(f"Filtered out system message from keywords: {k_clean}")
                 continue
@@ -754,7 +755,7 @@ def main():
         save_generation(brief, ai_kws, rows, md_output=md, generation_json=cleaned)
         
         if cleaned:
-            print(f"✅ Successfully generated {len(cleaned)} segments with keywords")
+            print(f"✅ Generated {len(cleaned)} segments")
         else:
             print("⚠️  Generated segments using fallback method (AI generation had issues)")
 

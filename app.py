@@ -395,7 +395,8 @@ def parse_generated_segments(output_text, brief=""):
                 # Skip keywords that look like system messages
                 if any(phrase in kw_clean.lower() for phrase in [
                     'successfully generated', 'segments with keywords', 'generation completed',
-                    'success', 'generated', 'completed', '✅', '⚠️', '🔄'
+                    'success', 'generated', 'completed', '✅', '⚠️', '🔄', 'segments',
+                    'with keywords', 'successfully', 'generation', 'complete'
                 ]):
                     print(f"Filtered out system message from keywords: {kw_clean}")
                     continue
