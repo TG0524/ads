@@ -67,10 +67,16 @@ def get_openai_client() -> OpenAI:
 # Data paths & Japanese mapping
 # ---------------------------------------
 def _path(*parts):
-    # Look in parent directory for data files
-    p1 = os.path.join("..", "data", *parts)
-    p2 = os.path.join("..", "Data", *parts)
-    return p1 if os.path.exists(p1) else p2
+    # Look in local Data directory first, then parent directory for data files
+    p1 = os.path.join("Data", *parts)
+    p2 = os.path.join("..", "data", *parts)
+    p3 = os.path.join("..", "Data", *parts)
+    if os.path.exists(p1):
+        return p1
+    elif os.path.exists(p2):
+        return p2
+    else:
+        return p3
 
 JAPAN_MAP_PATH = _path("japan.json")
 japanese_names = {}
@@ -209,14 +215,20 @@ def retrieve_segments():
         print(f"Running command: {' '.join(cmd)}")
 
         # Run the script
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd='..')
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd='.')
 
         print(f"Return code: {result.returncode}")
         print(f"STDOUT: {result.stdout}")
         print(f"STDERR: {result.stderr}")
 
         if result.returncode != 0:
-            return jsonify({'error': f'Script error: {result.stderr}'}), 500
+            return jsonify({
+                'error': f'Script error: {result.stderr}',
+                'stdout': result.stdout,
+                'return_code': result.returncode,
+                'command': ' '.join(cmd),
+                'working_directory': os.getcwd()
+            }), 500
 
         # Parse the output from 12.py
         segments = parse_retrieval_output(result.stdout)
@@ -259,14 +271,20 @@ def generate_segments():
         print(f"Running generate command: {' '.join(cmd)}")
 
         # Run the script
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd='..')
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd='.')
 
         print(f"Generate return code: {result.returncode}")
         print(f"Generate STDOUT: {result.stdout}")
         print(f"Generate STDERR: {result.stderr}")
 
         if result.returncode != 0:
-            return jsonify({'error': f'Script error: {result.stderr}'}), 500
+            return jsonify({
+                'error': f'Script error: {result.stderr}',
+                'stdout': result.stdout,
+                'return_code': result.returncode,
+                'command': ' '.join(cmd),
+                'working_directory': os.getcwd()
+            }), 500
 
         # Parse both retrieval results and generated segments
         segments, generated_segments = parse_full_output(result.stdout, campaign_brief)
@@ -473,8 +491,52 @@ def test():
     return jsonify({'message': 'Test endpoint working', 'files_exist': {
         'docs2.jsonl': os.path.exists('Data/docs2.jsonl'),
         'faiss2.index': os.path.exists('Data/faiss2.index'),
-        'japan.json': os.path.exists('Data/japan.json')
+        'japan.json': os.path.exists('Data/japan.json'),
+        '12.py': os.path.exists('./12.py')
     }})
+
+@app.route('/debug-script')
+def debug_script():
+    """Test if 12.py script can run"""
+    import subprocess
+    try:
+        # Test basic script execution
+        cmd = [sys.executable, './12.py', '--help']
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        
+        # Also test data file access
+        data_files = {
+            'docs2.jsonl': os.path.exists('Data/docs2.jsonl'),
+            'faiss2.index': os.path.exists('Data/faiss2.index'),
+            'japan.json': os.path.exists('Data/japan.json'),
+            '12.py': os.path.exists('./12.py')
+        }
+        
+        # Test environment variables
+        env_vars = {
+            'OPENAI_API_KEY': bool(os.getenv('OPENAI_API_KEY')),
+            'EMBEDDING_BACKEND': os.getenv('EMBEDDING_BACKEND'),
+            'EMBEDDING_MODEL': os.getenv('EMBEDDING_MODEL'),
+            'OPENAI_GEN_MODEL': os.getenv('OPENAI_GEN_MODEL')
+        }
+        
+        return jsonify({
+            'script_test': 'success' if result.returncode == 0 else 'failed',
+            'return_code': result.returncode,
+            'stdout': result.stdout[:500],
+            'stderr': result.stderr[:500],
+            'command': ' '.join(cmd),
+            'working_directory': os.getcwd(),
+            'data_files': data_files,
+            'environment': env_vars
+        })
+    except Exception as e:
+        return jsonify({
+            'script_test': 'failed',
+            'error': str(e),
+            'type': type(e).__name__,
+            'working_directory': os.getcwd()
+        })
 
 # ---------------------------------------
 # Entrypoint
