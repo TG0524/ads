@@ -278,8 +278,14 @@ def generate_segments():
         })
 
     except Exception as e:
-        print(f"Generate error: {e}")
-        return jsonify({'error': str(e)}), 500
+        print(f"❌ Generate error: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': str(e),
+            'type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }), 500
 
 # ---------------------------------------
 # Parsing helpers
