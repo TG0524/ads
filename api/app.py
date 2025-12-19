@@ -12,7 +12,9 @@ from openai import OpenAI
 
 # Set working directory to api folder for Railway/Render deployment
 API_DIR = os.path.dirname(os.path.abspath(__file__))
-os.chdir(API_DIR)
+if os.path.basename(os.getcwd()) != 'api':
+    os.chdir(API_DIR)
+print(f"Working directory: {os.getcwd()}")
 
 # ---------------------------------------
 # HTTPX client + OpenAI client (proxy-safe)
